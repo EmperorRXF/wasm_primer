@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WASM - Hello World</title>
+</head>
+
+<body>
+	<script src="hello.js"></script>
+	
+	<script>
+		"use strict";
+		
+		Module.onRuntimeInitialized = async _ => {
+			const api = {
+				//factorial: Module.cwrap('factorial', 'number', ['number']),
+			};
+			
+			//console.log("factorial 10 == " + api.factorial(10));
+		};
+	</script>
+</body>
+
+</html>

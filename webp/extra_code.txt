@@ -1,0 +1,46 @@
+const imgBinary = await loadWebp('sample_image.webp');
+const webpDecodePointer = Module._malloc(imgBinary.length);
+Module.HEAP8.set(imgBinary, webpDecodePointer);
+
+let widthHeightPointer = api.decode(webpDecodePointer, imgBinary.length);
+let widthHeightArray = new Uint32Array(Module.HEAP8.buffer, widthHeightPointer, 2);
+
+const decodeResultPointer = api.get_result_pointer();
+const decodeResultSize = api.get_result_size();
+const decodeResultView = new Uint8Array(Module.HEAP8.buffer, decodeResultPointer, decodeResultSize);
+const decodeResult = new Uint8ClampedArray(decodeResultView);
+api.free_result(decodeResultPointer);
+
+Module._free(decodeResultPointer);
+
+console.log("decodeResultPointer: " + decodeResultPointer);
+console.log("decodeResultSize: " + decodeResultSize);
+
+await drawImage(decodeResult, widthHeightArray[0], widthHeightArray[1]);
+
+
+================================================================================
+
+
+// Load webp image as byte array
+async function loadWebp(src) {
+	const buffer = await fetch(src).then(resp => resp.arrayBuffer());			
+	return new Uint8ClampedArray(buffer);
+}
+
+// Draw image data array on canvas
+async function drawImage(imgDataArray, width, height) {
+	// Load image
+	const imgData = new ImageData(imgDataArray, width, height);
+	
+	// Make canvas same size as image
+	const canvas = document.createElement('canvas');
+	canvas.width = width;
+	canvas.height = height;
+	
+	// Draw image onto canvas
+	const ctx = canvas.getContext('2d');
+	ctx.putImageData(imgData, 0, 0);
+	
+	document.getElementById('main').appendChild(canvas);
+}

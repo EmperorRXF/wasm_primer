@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WASM - WebP Image Demo</title>
+</head>
+
+<body>
+	<div id='main'></div>
+	
+	<script src="webp.js"></script>
+
+	<script>
+		Module.onRuntimeInitialized = async _ => {
+			const api = {
+				version: Module.cwrap('version', 'number', []),
+				decode: Module.cwrap('decode', '', ['number', 'number']),
+				free_result: Module.cwrap('free_result', '', ['number']),
+				get_result_pointer: Module.cwrap('get_result_pointer', 'number', []),
+				get_result_size: Module.cwrap('get_result_size', 'number', []),
+			};
+			
+			console.log(api.version());
+			
+			// https://stackoverflow.com/questions/5573096/detecting-webp-support
+		
+			function canUseWebP() {
+				var elem = document.createElement('canvas');
+
+				if (!!(elem.getContext && elem.getContext('2d'))) {
+					return elem.toDataURL('image/webp').indexOf('data:image/webp') == 0;
+				}
+				
+				return false;
+			}
+			
+			if (canUseWebP()) {
+				var img = document.createElement("img");
+				img.src = "sample_image.webp";
+
+				var src = document.getElementById("main");
+				src.appendChild(img);
+			}
+			else {
+				alert("Don't have WebP support.");
+			}
+		};
+	</script>
+</body>
+
+</html>
